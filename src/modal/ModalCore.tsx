@@ -37,8 +37,8 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
   return (
     <ModalContext.Provider value={modalContext}>
       {modalStacks.map((modal: ModalStack) => (
-        <div key={modal.id} onClick={() => handleRemoveModal(modal.id)}>
-          {modal.element}
+        <div key={modal.id}>
+          <Dimmed>{modal.element}</Dimmed>
         </div>
       ))}
       {children}
@@ -50,3 +50,13 @@ const useModalContext: () => ModalContextType = (): ModalContextType =>
   useContext(ModalContext);
 
 export { ModalProvider, useModalContext };
+
+const Dimmed = styled.div`
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0);
+  background: rgba(0, 0, 0, 0.3);
+`;
