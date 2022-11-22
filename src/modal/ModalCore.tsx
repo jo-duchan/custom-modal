@@ -23,8 +23,8 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const handleRemoveModal = useCallback((targetId: string) => {
-    setModalStacks((prevStates: any) =>
-      prevStates.filter(({ id }: any) => id !== targetId)
+    setModalStacks((prevStates: ModalStack[]) =>
+      prevStates.filter(({ id }: ModalStack) => id !== targetId)
     );
   }, []);
 
