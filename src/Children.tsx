@@ -1,6 +1,6 @@
 // Modal
 import { useModalContext } from "modal/ModalCore";
-import ModalContent from "modal/ModalContent";
+import Modal from "modal/Modal";
 
 function Children() {
   const modalContext = useModalContext();
@@ -8,20 +8,21 @@ function Children() {
     <>
       <div
         onClick={() => {
-          modalContext.handleShow(
-            "팝업1",
-            <ModalContent
+          const id: string = modalContext.handleShow(
+            <Modal
               description="You created a modal."
-              onClose={() => modalContext.handleHide("팝업1")}
+              onClose={() => modalContext.handleHide(id)}
             />
           );
+
+          console.log(id, "ID Check");
         }}
       >
         버튼
       </div>
       <div
         onClick={() => {
-          modalContext.handleHide("팝업1");
+          // modalContext.handleHide("팝업1");
         }}
       >
         취소
