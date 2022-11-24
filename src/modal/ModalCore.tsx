@@ -1,14 +1,16 @@
 import React, { useContext, useCallback, useState } from "react";
 import styled from "styled-components";
+import ModalContent from "modal/ModalContent";
 
 type ModalContextType = {
-  handleShow: (id: string, element: React.ReactNode) => void;
+  handleShow: (element: React.ReactNode) => string;
   handleHide: (id: string) => void;
 };
 
 type ModalStack = {
   id: string;
   element: React.ReactNode;
+  onClose: () => void;
 };
 
 const ModalContext = React.createContext<ModalContextType>(
@@ -18,8 +20,20 @@ const ModalContext = React.createContext<ModalContextType>(
 function ModalProvider({ children }: { children: React.ReactNode }) {
   const [modalStacks, setModalStacks] = useState<ModalStack[]>([]);
 
-  const handleAddModal = useCallback((modalNode: ModalStack) => {
-    setModalStacks((prevStates: ModalStack[]) => [...prevStates, modalNode]);
+  const handleAddModal = useCallback((modalNode: React.ReactNode): string => {
+    const id: string = Math.random().toString();
+
+    const onClose = () => {
+      setModalStacks((prevStates: ModalStack[]) =>
+        prevStates.filter((modal) => modal.id !== id)
+      );
+    };
+    setModalStacks((prevStates: ModalStack[]) => [
+      ...prevStates,
+      { id: id, element: modalNode, onClose: onClose },
+    ]);
+
+    return id;
   }, []);
 
   const handleRemoveModal = useCallback((targetId: string) => {
@@ -29,18 +43,28 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const modalContext = {
-    handleShow: (id: string, element: React.ReactNode) =>
-      handleAddModal({ id, element }),
+    handleShow: (element: React.ReactNode) => handleAddModal(element),
     handleHide: (id: string) => handleRemoveModal(id),
   };
 
+  const renderModal = useCallback(() => {
+    if (modalStacks.length === 0) {
+      return <></>;
+    }
+
+    return (
+      <ModalContainer>
+        {modalStacks.map((modal: ModalStack) => (
+          <ModalContent key={modal.id} content={modal} />
+          // <div key={modal.id}>{modal.element}</div>
+        ))}
+      </ModalContainer>
+    );
+  }, [modalStacks]);
+
   return (
     <ModalContext.Provider value={modalContext}>
-      {modalStacks.map((modal: ModalStack) => (
-        <div key={modal.id}>
-          <Dimmed>{modal.element}</Dimmed>
-        </div>
-      ))}
+      {renderModal()}
       {children}
     </ModalContext.Provider>
   );
@@ -51,7 +75,7 @@ const useModalContext: () => ModalContextType = (): ModalContextType =>
 
 export { ModalProvider, useModalContext };
 
-const Dimmed = styled.div`
+const ModalContainer = styled.div`
   position: fixed;
   width: 100%;
   height: 100%;
