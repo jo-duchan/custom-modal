@@ -13,9 +13,6 @@ interface StyledProps {
 }
 
 function Modal({ description, onClose }: Props) {
-  useEffect(() => {
-    console.log("hello~");
-  }, []);
   return (
     <Container>
       <InnerWrapper>
@@ -36,10 +33,10 @@ function Modal({ description, onClose }: Props) {
 export default Modal;
 
 const Container = styled.div`
-  position: absolute;
+  /* position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate3d(-50%, -50%, 0);
+  transform: translate3d(-50%, -50%, 0); */
   width: 320px;
   height: 200px;
   background: #fff;
