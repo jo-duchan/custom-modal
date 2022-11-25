@@ -1,20 +1,12 @@
-import React, { useContext, useCallback, useState } from "react";
+import React, { useContext, useCallback, useState, useMemo } from "react";
 import styled from "styled-components";
-import ModalContent from "modal/ModalContent";
-
-type ModalContextType = {
-  handleShow: ({ element, type }: ModalStack) => string;
-  handleHide: (id: string) => void;
-};
-
-type ModalStack = {
-  id?: string;
-  element: React.ReactNode;
-  type: ModalType;
-  onClose?: () => void;
-};
-
-type ModalType = "POPUP" | "TOAST" | "PROGRESS";
+import {
+  ModalContextType,
+  ModalStack,
+  ModalType,
+  ModalElement,
+} from "type/modal-type";
+import ModalContainer from "modal/ModalContainer";
 
 const ModalContext = React.createContext<ModalContextType>(
   {} as ModalContextType
@@ -24,17 +16,12 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
   const [modalStacks, setModalStacks] = useState<ModalStack[]>([]);
 
   const handleAddModal = useCallback(
-    (modalNode: React.ReactNode, type: ModalType): string => {
+    (modalNode: ModalElement, type: ModalType) => {
       const id: string = Math.random().toString();
 
-      const onClose = () => {
-        setModalStacks((prevStates: ModalStack[]) =>
-          prevStates.filter((modal) => modal.id !== id)
-        );
-      };
       setModalStacks((prevStates: ModalStack[]) => [
         ...prevStates,
-        { id: id, element: modalNode, type: type, onClose: onClose },
+        { id, element: modalNode, type, fadeOut: false },
       ]);
 
       return id;
@@ -42,30 +29,50 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const handleRemoveModal = useCallback((targetId: string) => {
-    setModalStacks((prevStates: ModalStack[]) =>
-      prevStates.filter(({ id }: ModalStack) => id !== targetId)
-    );
-  }, []);
+  const handleRemoveModal = useCallback(
+    (targetId: string, type?: ModalType) => {
+      const remove = () => {
+        setModalStacks((prevStates: ModalStack[]) =>
+          prevStates.filter(({ id }: ModalStack) => id !== targetId)
+        );
+      };
+      if (type === "MENU" || type === "TOAST") {
+        setModalStacks((prevStates: ModalStack[]) =>
+          prevStates.map((prevStates) =>
+            prevStates.id === targetId
+              ? { ...prevStates, fadeOut: true }
+              : prevStates
+          )
+        );
 
-  const modalContext = {
-    handleShow: ({ element, type }: ModalStack) =>
-      handleAddModal(element, type),
-    handleHide: (id: string) => handleRemoveModal(id),
-  };
+        setTimeout(() => remove(), 300);
+        return;
+      }
+
+      remove();
+    },
+    []
+  );
+
+  const modalContext = useMemo(() => {
+    return {
+      handleShow: (element: ModalElement, type: ModalType) =>
+        handleAddModal(element, type),
+      handleHide: (id: string, type?: ModalType) => handleRemoveModal(id, type),
+    };
+  }, [handleAddModal, handleRemoveModal]);
 
   const renderModal = useCallback(() => {
     if (modalStacks.length === 0) {
-      return <></>;
+      return <> </>;
     }
 
     return (
-      <ModalContainer>
+      <Outside>
         {modalStacks.map((modal: ModalStack) => (
-          <ModalContent key={modal.id} content={modal} />
-          // <div key={modal.id}>{modal.element}</div>
+          <ModalContainer key={modal.id} content={modal} />
         ))}
-      </ModalContainer>
+      </Outside>
     );
   }, [modalStacks]);
 
@@ -82,15 +89,15 @@ const useModalContext: () => ModalContextType = (): ModalContextType =>
 
 export { ModalProvider, useModalContext };
 
-const ModalContainer = styled.div`
+const Outside = styled.div`
   position: fixed;
   width: 100%;
   height: 100%;
   top: 50%;
   left: 50%;
   transform: translate3d(-50%, -50%, 0);
-  background: rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
+  z-index: 999999;
 `;

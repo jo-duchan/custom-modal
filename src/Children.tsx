@@ -2,6 +2,7 @@ import styled from "styled-components";
 // Modal
 import { useModalContext } from "modal/ModalCore";
 import Modal from "modal/Modal";
+import { ModalType } from "type/modal-type";
 
 function Children() {
   const modalContext = useModalContext();
@@ -9,17 +10,15 @@ function Children() {
     <Container>
       <div
         onClick={() => {
-          const id: string = modalContext.handleShow({
-            element: (
-              <Modal
-                description="You created a modal."
-                onClose={() => modalContext.handleHide(id)}
-              />
-            ),
-            type: "TOAST",
-          });
-
-          console.log(id, "ID Check");
+          modalContext.handleShow(
+            <Modal
+              description="You created a modal."
+              onClose={(id: string, type: ModalType) =>
+                modalContext.handleHide(id, type)
+              }
+            />,
+            "POPUP"
+          );
         }}
       >
         버튼

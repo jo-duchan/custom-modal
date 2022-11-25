@@ -2,23 +2,22 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 
 // Type
-interface Props {
-  description: string;
-  onClose: () => void;
-}
-
 interface StyledProps {
   color: string;
   background: string;
 }
 
-function Modal({ description, onClose }: Props) {
+function Modal(props: any) {
+  const { id, type, description, onClose } = props;
+  const handleClose = () => {
+    onClose(id, type);
+  };
   return (
     <Container>
       <InnerWrapper>
         <Description>{description}</Description>
         <ButtonWrapper>
-          <Button onClick={onClose} background="#eeeeee" color="#191919">
+          <Button onClick={handleClose} background="#eeeeee" color="#191919">
             Close
           </Button>
           <Button background="#247EF4" color="#FFF">
@@ -33,10 +32,10 @@ function Modal({ description, onClose }: Props) {
 export default Modal;
 
 const Container = styled.div`
-  /* position: absolute;
+  position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate3d(-50%, -50%, 0); */
+  transform: translate3d(-50%, -50%, 0);
   width: 320px;
   height: 200px;
   background: #fff;
