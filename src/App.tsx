@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import Children from "Children";
+import Demo from "demo/Demo";
 
 // Modal
 import { ModalProvider } from "modal/ModalCore";
@@ -13,7 +13,7 @@ function App() {
     <Container>
       <ModalProvider>
         <GlobalStyle />
-        <Children />
+        <Demo />
       </ModalProvider>
     </Container>
   );
@@ -22,9 +22,6 @@ function App() {
 export default App;
 
 const Container = styled.div`
-  display: flex;
-  /* align-items: center;
-  justify-content: center; */
   width: 100%;
   height: 100%;
 `;
