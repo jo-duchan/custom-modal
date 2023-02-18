@@ -1,1 +1,3 @@
-# Custom Modal
+# Overview
+Custom-modal은 단순하고 사용하기 쉬운 형태로 만들어졌으며, 컴포넌트를 넘겨받는 방식으로 사용하기 때문에 커스텀 확장성이 뛰어납니다.  
+총 4가지 타입(Popup, Toast, Progress, Menu)으로 사용할 수 있으며, 스택 형태로 구현하여 다중 사용도 가능합니다.
